@@ -16,6 +16,15 @@ RUN ["useradd", "-r", "-c", "Go User", "-g", "go", "-d", "/var/go", "-m", "-s", 
 RUN ["mkdir", "-p", "/var/lib/go-server/addons", "/var/log/go-server", "/etc/go", "/go-addons"]
 RUN ["touch", "/etc/go/postgresqldb.properties"]
 RUN ["chown", "-R", "go:go", "/var/lib/go-server", "/var/log/go-server", "/etc/go", "/go-addons"]
+
+# install docker
+RUN ["apt-get", "update"]
+RUN ["apt-get", "install", "wget"]
+RUN ["sh", "-c", "wget -qO- https://get.docker.io/gpg | apt-key add -"]
+RUN ["sh", "-c", "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"]
+RUN ["apt-get", "update"]
+RUN ["apt-get", "-y", "install", "lxc-docker"]
+
 VOLUME ["/var/lib/go-server", "/var/log/go-server", "/etc/go", "/go-addons"]
 
 WORKDIR /tmp
