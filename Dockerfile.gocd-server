@@ -17,6 +17,13 @@ RUN ["mkdir", "-p", "/var/lib/go-server/addons", "/var/log/go-server", "/etc/go"
 RUN ["touch", "/etc/go/postgresqldb.properties"]
 RUN ["chown", "-R", "go:go", "/var/lib/go-server", "/var/log/go-server", "/etc/go", "/go-addons"]
 
+VOLUME ["/var/lib/go-server", "/var/log/go-server", "/etc/go", "/go-addons"]
+
+WORKDIR /tmp
+RUN dpkg -i --debug=10 /tmp/go-server.deb
+RUN sed -i -e 's/DAEMON=Y/DAEMON=N/' /etc/default/go-server
+EXPOSE 8153 8154
+
 # install docker
 RUN ["apt-get", "update"]
 RUN ["apt-get", "install", "wget"]
@@ -24,13 +31,7 @@ RUN ["sh", "-c", "wget -qO- https://get.docker.io/gpg | apt-key add -"]
 RUN ["sh", "-c", "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"]
 RUN ["apt-get", "update"]
 RUN ["apt-get", "-y", "install", "lxc-docker"]
-
-VOLUME ["/var/lib/go-server", "/var/log/go-server", "/etc/go", "/go-addons"]
-
-WORKDIR /tmp
-RUN dpkg -i --debug=10 /tmp/go-server.deb
-RUN sed -i -e 's/DAEMON=Y/DAEMON=N/' /etc/default/go-server
-EXPOSE 8153 8154
+RUN ["usermod", "-a", "-G", "docker", "go"]
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
